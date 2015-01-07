@@ -1,0 +1,8 @@
+# exe file
+*.out
+*.o
+
+# test file
+t.c
+test.c
+t?.c
