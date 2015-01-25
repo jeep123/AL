@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <iostream>
 #include <string.h>
+using namespace std;
 
 #define MAX 100
 
@@ -36,6 +38,89 @@ SundayMatch(char* pSrc, int nSrcSize, char* pSubSrc, int nSubSrcSize)
 	}
 	return nPos;
 }
+
+/*
+ * Name: kmp
+ * Description: kmp method for string match.
+ */
+ int
+ kmp(const char* text, int text_len, const char* find, int find_len)
+ {
+ 	if (text == NULL || find == NULL)
+		return -1;
+//	int find_len = strlen(find);
+//	int text_len = strlen(text);
+	if (text_len < find_len)
+		return -1;
+	int map[find_len];
+	memset(map, 0, find_len*sizeof(int));
+	// initial the kmp base array: map
+	map[0] = 0;
+	int i;
+	for (i = 1; i < find_len; i++)
+	{
+		if (map[i - 1] == 0)
+		{
+			if (find[i] == find[0])
+				map[i] = 1;
+			else
+				map[i] = 0;
+		}
+		else
+		{
+			if (find[i] == find[map[i - 1]])
+				map[i] = map[i - 1] + 1;
+			else if (find[i] == find[0])
+				map[i] = 1;
+			else
+				map[i] = 0;
+		}
+	}
+
+	int j = 0;
+	i = 0;
+	while (i < text_len && j < find_len)
+	{
+		if (text[i] == find[j])
+		{
+			i++;
+			j++;
+			continue;
+		}
+		if (j == 0)
+		{
+			i++;
+			continue;
+		}
+		j = map[j - 1];
+	}
+
+	if (j == find_len)
+		return (i - j);
+	return -1;
+
+
+/*	while (i < text_len)
+	{
+		while (i < text_len && j != find_len && text[i] == find[j])
+		{
+			j++;
+			i++;
+		}
+		if (j == find_len)
+			return (i - j);
+		if (j == 0)
+		{
+			i++;
+			continue;
+		}
+		j = map[j - 1];
+	}
+	return -1;
+*/
+}
+
+
 
 static size_t
 FindLocation(char* byte, char* str, size_t size)
@@ -143,8 +228,9 @@ main(int argc, char** argv)
 		puts("===============");
 		puts(res);
 	}
-	int nPos = SundayMatch(str, strlen(str), pattern, strlen(pattern));
-	if (nPos) {
+//	int nPos = SundayMatch(str, strlen(str), pattern, strlen(pattern));
+	int nPos = kmp(str, strlen(str), pattern, strlen(pattern));
+	if (nPos != -1) {
 		puts("++++++++++++++++++");
 		puts(&str[nPos]);
 	}
